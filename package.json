@@ -1,0 +1,21 @@
+{
+  "name": "SpotifyLyrics",
+  "version": "0.0.1",
+  "description": "An small app to show lyrics from spotify",
+  "dependencies": {
+    "menubar": "*",
+    "electron-rpc": "2.0.1",
+    "superagent": "latest",
+    "@jonny/spotify-web-helper": "latest",
+    "remove-accents": "0.3.0"
+  },
+  "devDependencies": {
+    "electron-packager": "^5.1.0",
+    "electron-prebuilt": "^0.36.0"
+  },
+  "main": "main.js",
+  "scripts": {
+    "build": "electron-packager . Example --platform=darwin --arch=x64 --version=0.36.0 --icon=Icon.icns",
+    "start": "electron ."
+  }
+}
