@@ -2,7 +2,9 @@
 
 ## Introduction
 
-It is a simple widget that shows lyrics on your menu bar. It detect what your are playing on Spotify, so you don't need to search for the lyrics on Google anymore!
+It is a simple widget that shows lyrics on your menu bar. It detect what your are playing on Spotify, so you don't need to search for the lyrics on Google anymore!  
+
+![spotifylyrics](https://github.com/kevchentw/SpotifyLyrics/blob/gh-pages/static/img/preview-1.png?raw=true)
 
 ## Platform
 
