@@ -6,7 +6,8 @@ It is a simple widget that shows lyrics on your menu bar. It detect what your ar
 
 ## Platform
 
-It support run on Mac, Windows, and Linux. (Thanks to Electron!)
+It supports Mac, Windows, and Linux. (Thanks to Electron!)
+Currently, only Mac version is tested.
 
 ## Download
 
