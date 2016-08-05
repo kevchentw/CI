@@ -3,7 +3,7 @@ var accents = require('remove-accents')
 
 var mb = menubar({
     width: 415,
-    height: 520,
+    height: 550,
     // showDockIcon: true
 })
 var SpotifyWebHelper = require('@jonny/spotify-web-helper')
@@ -67,17 +67,37 @@ function initSpotify(){
     helper.player.on('ready', function() {
         spotify_ready = true;
         refresh_lyrics(helper.status.track);
+        var player_status = {
+            'status': helper.status.playing
+        }
+        app.send('player_status_change', player_status);
         helper.player.on('play', function() {
+            var player_status = {
+                'status': true
+            }
+            app.send('player_status_change', player_status);
             console.log('play');
         })
         helper.player.on('pause', function() {
+            var player_status = {
+                'status': false
+            }
+            app.send('player_status_change', player_status);
             console.log('pause');
         })
         helper.player.on('end', function() {
+            var player_status = {
+                'status': helper.status.playing
+            }
+            app.send('player_status_change', player_status);
             console.log('end');
         })
         helper.player.on('track-change', function(track) {
             console.log('change');
+            var player_status = {
+                'status': helper.status.playing
+            }
+            app.send('player_status_change', player_status);
             var data = {
                 'url': generate_musixmatch_url(track)
             };
@@ -124,4 +144,23 @@ app.on('refresh_spotify', function terminate (ev) {
     helper = SpotifyWebHelper();
     initSpotify();
     console.info("refresh_spotify");
+})
+
+app.on('pinned', function terminate (req, next) {
+    var next_pinned_status = !mb.getOption('alwaysOnTop');
+    mb.setOption('alwaysOnTop', next_pinned_status);
+    next(null, {'new_pinned_status': next_pinned_status});
+    console.info("pinned");
+})
+
+app.on('play_pause', function terminate (ev) {
+    if(spotify_ready){
+        if(helper.status.playing){
+            helper.player.pause();
+        }
+        else{
+            helper.player.pause(true);
+        }
+    }
+    console.info("play_pause");
 })

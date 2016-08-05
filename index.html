@@ -2,16 +2,30 @@
 <html>
 <head>
 <title>SpotifyLyrics</title>
-<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="./main.css" rel="stylesheet">
 </head>
 <body>
     <webview src="" id="lyrics_view" style="display:inline-flex; width:100%; height:480px"
     autosize="on">
     </webview>
-    <button id='btnQuit' onclick="quit()">Quit</button>
-    <button id='btnDev' onclick="dev()">DevTools</button>
-    <button id='btnrefreshLyrics' onclick="refresh_lyrics()">Refresh Lyrics</button>
-    <button id='btnrefreshSpotify' onclick="refresh_spotify()">Refresh Spotify</button>
+    <div class="buttons-bar">
+        <button class="button-icon" id='btnQuit' onclick="quit()">
+            <i class="icon material-icons md-light">exit_to_app</i>
+        </button>
+        <button class="button-icon" id='btnDev' onclick="dev()">
+            <i class="icon material-icons md-light">code</i>
+        </button>
+        <button class="button-icon" id='btbPlay' onclick="playPause()">
+            <i id='iconPlay' class="icon material-icons md-light">play_arrow</i>
+        </button>
+        <button class="button-icon" id='btnRefreshSpotify' onclick="refresh_spotify()">
+            <i class="icon material-icons md-light">refresh</i>
+        </button>
+        <button class="button-icon" id='btnPinned' onclick="pinned()">
+            <i id='iconPinned' class="icon material-icons md-light">lock_open</i>
+        </button>
+    <div>
     <script src="app.js"></script>
 </body>
 </html>
