@@ -1,7 +1,8 @@
-# example menubar app
+# Spotify Lyrics
 
-## instructions
+## dev instructions
 
 - run `npm install`
-- run `npm run build` to make Example.app
-- run `npm start` to run app from CLI without building Example.app
+- run `npm run build` to makeapp
+- run `npm start` to run app from CLI without building app
+- run `electron-packager .  --all --overwrite` to build Linux, Mac, Windows App
