@@ -1,6 +1,5 @@
 var Client = require('electron-rpc/client')
 var client = new Client()
-var request = require('superagent');
 
 
 client.on('new_track', function(err, body) {

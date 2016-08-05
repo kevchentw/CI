@@ -1,30 +1,56 @@
 var menubar = require('menubar')
 var accents = require('remove-accents')
+var dialog = require('dialog');
+const shell = require('electron').shell;
 
 var mb = menubar({
     width: 415,
     height: 550,
-    // showDockIcon: true
+    resizable: false,
 })
 var SpotifyWebHelper = require('@jonny/spotify-web-helper')
 var helper = SpotifyWebHelper()
 initSpotify()
-
+var compare = require('node-version-compare');
+var VERSION_URL = "https://raw.githubusercontent.com/kevchentw/SpotifyLyrics/master/version"
+var RELEASE_URL = "https://github.com/kevchentw/SpotifyLyrics/releases"
+var request = require('superagent');
 var Server = require('electron-rpc/server')
 var app = new Server()
-
 var mb_ready = false;
 var spotify_ready = false;
 
-function remove_remastered(s){
-    return s.split('- Remastered')[0].trim();
+function check_new_version() {
+    request
+        .get(VERSION_URL)
+        .end(function(err, res) {
+            var now_version = mb.app.getVersion()
+            var lastest_version = res.text
+            var result = compare(lastest_version, now_version)
+            if (result > 0) {
+                var index = dialog.showMessageBox(mb.window, {
+                  type: 'info',
+                  buttons: ['Download', 'Cancel'],
+                  title: "New Version Available",
+                  message: 'New Version Available',
+                  detail: `You are currently on v${now_version}, update to v${lastest_version} to try out new features!`
+                });
+                console.log(index);
+                if (index==1){
+                    return
+                }
+                else if (index==0) {
+                    shell.openExternal(RELEASE_URL);
+                }
+            }
+        });
 }
 
-function replaceDot(s){
+function replaceDot(s) {
     return s.replace(".", "-2").trim();
 }
 
-function removeBrackets(s){
+function removeBrackets(s) {
     return s.replace(/ *\([^)]*\) */g, "").trim();
 }
 
@@ -37,7 +63,6 @@ function removeDash(s) {
 }
 
 function parseString(s) {
-    // s = remove_remastered(s);
     s = removeDash(s);
     s = removeBrackets(s);
     s = replaceDot(s);
@@ -48,119 +73,126 @@ function parseString(s) {
 }
 
 function generate_musixmatch_url(track) {
-    var u = `https://www.musixmatch.com/lyrics/${parseString(track.artist_resource.name)}/${parseString(track.track_resource.name)}/embed`
-    console.info(u);
-    return u
+    return `https://www.musixmatch.com/lyrics/${parseString(track.artist_resource.name)}/${parseString(track.track_resource.name)}/embed`
 }
 
-function refresh_lyrics(track){
-    console.info('update');
+function refresh_lyrics(track) {
     var data = {
         'url': generate_musixmatch_url(track)
     };
-    if(mb_ready){
+    if (mb_ready) {
         app.send('new_track', JSON.stringify(data));
     }
 }
 
-function initSpotify(){
+function initSpotify() {
     helper.player.on('ready', function() {
         spotify_ready = true;
         refresh_lyrics(helper.status.track);
-        var player_status = {
-            'status': helper.status.playing
-        }
-        app.send('player_status_change', player_status);
+        send_player_status_change(helper.status.playing);
         helper.player.on('play', function() {
-            var player_status = {
-                'status': true
-            }
-            app.send('player_status_change', player_status);
-            console.log('play');
+            send_player_status_change(true);
         })
+
         helper.player.on('pause', function() {
-            var player_status = {
-                'status': false
-            }
-            app.send('player_status_change', player_status);
-            console.log('pause');
+            send_player_status_change(false);
         })
+
         helper.player.on('end', function() {
-            var player_status = {
-                'status': helper.status.playing
-            }
-            app.send('player_status_change', player_status);
-            console.log('end');
+            send_player_status_change(helper.status.playing);
         })
+
         helper.player.on('track-change', function(track) {
-            console.log('change');
-            var player_status = {
-                'status': helper.status.playing
-            }
-            app.send('player_status_change', player_status);
-            var data = {
-                'url': generate_musixmatch_url(track)
-            };
-            if(mb_ready){
-                app.send('new_track', JSON.stringify(data));
-            }
+            send_player_status_change(helper.status.playing);
+            send_new_track(track);
         })
 
         helper.player.on('error', function(err) {
-            console.log('error');
         })
     });
 }
 
+function send_pinned_status() {
+    var pinned_status = {
+        'status': mb.getOption('alwaysOnTop')
+    }
+    if (mb_ready) {
+        app.send('pinned_status', pinned_status);
+    }
+}
 
+function send_player_status_change(s) {
+    var player_status = {
+        'status': s
+    }
+    if (mb_ready) {
+        app.send('player_status_change', player_status);
+    }
+}
+
+function send_new_track(track) {
+    var data = {
+        'url': generate_musixmatch_url(track)
+    };
+    if (mb_ready) {
+        app.send('new_track', JSON.stringify(data));
+    }
+}
+
+
+// menubar event listener
 mb.on('ready', function ready() {
     console.log('app is ready');
 })
 
+mb.on('show', function ready() {
+    send_pinned_status();
+    console.log('show');
+})
+
 mb.on('after-create-window', function show() {
     app.configure(mb.window.webContents);
+    check_new_version()
     mb_ready = true;
     // mb.window.openDevTools();
 })
 
-app.on('terminate', function terminate (ev) {
+
+// rpc
+app.on('terminate', function terminate(ev) {
     mb.app.quit();
-    console.info("terminate")
 })
 
-app.on('dev', function terminate (ev) {
+app.on('dev', function terminate(ev) {
     mb.window.openDevTools();
-    console.info("dev")
 })
 
-app.on('refresh_lyrics', function terminate (ev) {
-    if(spotify_ready){
+app.on('refresh_lyrics', function terminate(ev) {
+    if (spotify_ready) {
         refresh_lyrics(helper.status.track);
     }
-    console.info("refresh_lyrics");
 })
 
-app.on('refresh_spotify', function terminate (ev) {
+app.on('refresh_spotify', function terminate(ev) {
     helper = SpotifyWebHelper();
     initSpotify();
-    console.info("refresh_spotify");
 })
 
-app.on('pinned', function terminate (req, next) {
+app.on('pinned', function terminate(req, next) {
     var next_pinned_status = !mb.getOption('alwaysOnTop');
     mb.setOption('alwaysOnTop', next_pinned_status);
-    next(null, {'new_pinned_status': next_pinned_status});
-    console.info("pinned");
+    next(null, {
+        'new_pinned_status': next_pinned_status
+    });
+    mb.window.setAlwaysOnTop(next_pinned_status)
 })
 
-app.on('play_pause', function terminate (ev) {
-    if(spotify_ready){
-        if(helper.status.playing){
+app.on('play_pause', function terminate(ev) {
+    if (spotify_ready) {
+        if (helper.status.playing) {
             helper.player.pause();
-        }
-        else{
+        } else {
             helper.player.pause(true);
         }
     }
-    console.info("play_pause");
 })
