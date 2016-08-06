@@ -13,8 +13,8 @@ var SpotifyWebHelper = require('@jonny/spotify-web-helper')
 var helper = SpotifyWebHelper()
 initSpotify()
 var compare = require('node-version-compare');
-var VERSION_URL = "https://raw.githubusercontent.com/kevchentw/SpotifyLyrics/master/version"
-var RELEASE_URL = "https://github.com/kevchentw/SpotifyLyrics/releases"
+var VERSION_URL = "https://raw.githubusercontent.com/kevchentw/CI/master/version"
+var RELEASE_URL = "https://github.com/kevchentw/CI/releases"
 var request = require('superagent');
 var Server = require('electron-rpc/server')
 var app = new Server()
