@@ -1,6 +1,6 @@
 {
   "name": "SpotifyLyrics",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An small app to show lyrics from spotify",
   "dependencies": {
     "menubar": "*",
