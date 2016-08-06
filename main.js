@@ -36,7 +36,6 @@ function check_new_version() {
                   message: 'New Version Available',
                   detail: `You are currently on v${now_version}, update to v${lastest_version} to try out new features!`
                 });
-                console.log(index);
                 if (index==1){
                     return
                 }
@@ -143,12 +142,10 @@ function send_new_track(track) {
 
 // menubar event listener
 mb.on('ready', function ready() {
-    console.log('app is ready');
 })
 
 mb.on('show', function ready() {
     send_pinned_status();
-    console.log('show');
 })
 
 mb.on('after-create-window', function show() {
