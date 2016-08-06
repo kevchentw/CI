@@ -2,7 +2,9 @@
 
 ## Introduction
 
-It is a simple widget that shows lyrics on your menu bar. It detect what your are playing on Spotify, so you don't need to search for the lyrics on Google anymore!
+It is a simple widget that shows lyrics on your menu bar. It detect what your are playing on Spotify, so you don't need to search for the lyrics on Google anymore!  
+
+![spotifylyrics](https://github.com/kevchentw/SpotifyLyrics/blob/gh-pages/static/img/preview-1.png?raw=true)
 
 ## Platform
 
@@ -23,3 +25,6 @@ Or send me [Facebook message](https://www.facebook.com/kevchentw)
 - run `npm run build` to makeapp
 - run `npm start` to run app from CLI without building app
 - run `electron-packager .  --all --overwrite` to build Linux, Mac, Windows App
+
+## License
+MIT © [Kevin Chen](https://github.com/kevchentw)
