@@ -7,6 +7,7 @@ var mb = menubar({
     width: 415,
     height: 550,
     resizable: false,
+    icon: __dirname + '/icon.png'
 })
 var SpotifyWebHelper = require('@jonny/spotify-web-helper')
 var helper = SpotifyWebHelper()
