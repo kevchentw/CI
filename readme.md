@@ -1,10 +1,12 @@
-# Spotify Lyrics
+# CI
 
-## Introduction
+CI shows lyrics that you are currently playing on Spotify.  
 
-It is a simple widget that shows lyrics on your menu bar. It detect what your are playing on Spotify, so you don't need to search for the lyrics on Google anymore!  
+<img src="https://github.com/kevchentw/CI/blob/gh-pages/static/img/ci-color.png?raw=true" width="100">
 
-![spotifylyrics](https://github.com/kevchentw/SpotifyLyrics/blob/gh-pages/static/img/preview-1.png?raw=true)
+## Screenshot
+
+<img src="https://github.com/kevchentw/CI/blob/gh-pages/static/img/preview-1.png?raw=true" width="500">
 
 ## Platform
 
@@ -13,7 +15,7 @@ Currently, only Mac version is tested.
 
 ## Download
 
-Checkout our [Releases Page](https://github.com/kevchentw/SpotifyLyrics/releases)
+Checkout our [Releases Page](https://github.com/kevchentw/CI/releases)
 
 ## Bug Report
 Open a issue on this repo.
