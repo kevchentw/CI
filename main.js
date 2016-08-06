@@ -173,6 +173,7 @@ app.on('refresh_lyrics', function terminate(ev) {
 
 app.on('refresh_spotify', function terminate(ev) {
     helper = SpotifyWebHelper();
+    spotify_ready = false;
     initSpotify();
 })
 
