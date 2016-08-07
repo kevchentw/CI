@@ -2,6 +2,8 @@
 
 CI shows lyrics that you are currently playing on Spotify.  
 
+Ci(詞) is a Chinese Character, which means Classical Chinese lyric poetry.
+
 <img src="https://github.com/kevchentw/CI/blob/gh-pages/static/img/ci-color.png?raw=true" width="100">
 
 ## Screenshot
