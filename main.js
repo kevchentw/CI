@@ -11,7 +11,6 @@ var mb = menubar({
 })
 var SpotifyWebHelper = require('@jonny/spotify-web-helper')
 var helper = SpotifyWebHelper()
-initSpotify()
 var compare = require('node-version-compare');
 var VERSION_URL = "https://raw.githubusercontent.com/kevchentw/CI/master/version"
 var RELEASE_URL = "https://github.com/kevchentw/CI/releases"
@@ -30,18 +29,52 @@ function check_new_version() {
             var result = compare(lastest_version, now_version)
             if (result > 0) {
                 var index = dialog.showMessageBox(mb.window, {
-                  type: 'info',
-                  buttons: ['Download', 'Cancel'],
-                  title: "New Version Available",
-                  message: 'New Version Available',
-                  detail: `You are currently on v${now_version}, update to v${lastest_version} to try out new features!`
+                    type: 'info',
+                    buttons: ['Download', 'Cancel'],
+                    title: "New Version Available",
+                    message: 'New Version Available',
+                    detail: `You are currently on v${now_version}, update to v${lastest_version} to try out new features!`
                 });
-                if (index==1){
+                if (index == 1) {
                     return
-                }
-                else if (index==0) {
+                } else if (index == 0) {
                     shell.openExternal(RELEASE_URL);
                 }
+            }
+        });
+}
+
+function get_lyrics_from_best_result() {
+    var track = helper.status.track
+    request
+        .get(`https://www.musixmatch.com/search/${encodeURI(track.artist_resource.name)}%20${encodeURI(track.track_resource.name)}`)
+        .end(function(err, res) {
+            var url = res.text.match('<a class="title" href="(.*)" data-reactid="94"')
+            if (url && url.length > 0) {
+                success = true;
+                var data = {
+                    'url': `https://www.musixmatch.com${url[1]}/embed`,
+                    'track': track
+                };
+                if (mb_ready) {
+                    app.send('new_track', data);
+                }
+            } else {
+                request
+                    .get(`https://www.musixmatch.com/search/${encodeURI(parseString(track.artist_resource.name))}%20${encodeURI(parseString(track.track_resource.name))}`)
+                    .end(function(err, res) {
+                        var url = res.text.match('<a class="title" href="(.*)" data-reactid="94"')
+                        if (url && url.length > 0) {
+                            success = true;
+                            var data = {
+                                'url': `https://www.musixmatch.com${url[1]}/embed`,
+                                'track': track
+                            };
+                            if (mb_ready) {
+                                app.send('new_track', data);
+                            }
+                        }
+                    });
             }
         });
 }
@@ -76,19 +109,10 @@ function generate_musixmatch_url(track) {
     return `https://www.musixmatch.com/lyrics/${parseString(track.artist_resource.name)}/${parseString(track.track_resource.name)}/embed`
 }
 
-function refresh_lyrics(track) {
-    var data = {
-        'url': generate_musixmatch_url(track)
-    };
-    if (mb_ready) {
-        app.send('new_track', JSON.stringify(data));
-    }
-}
-
 function initSpotify() {
     helper.player.on('ready', function() {
         spotify_ready = true;
-        refresh_lyrics(helper.status.track);
+        send_new_track(helper.status.track);
         send_player_status_change(helper.status.playing);
         helper.player.on('play', function() {
             send_player_status_change(true);
@@ -107,8 +131,7 @@ function initSpotify() {
             send_new_track(track);
         })
 
-        helper.player.on('error', function(err) {
-        })
+        helper.player.on('error', function(err) {})
     });
 }
 
@@ -132,17 +155,17 @@ function send_player_status_change(s) {
 
 function send_new_track(track) {
     var data = {
-        'url': generate_musixmatch_url(track)
+        'url': generate_musixmatch_url(track),
+        'track': track
     };
     if (mb_ready) {
-        app.send('new_track', JSON.stringify(data));
+        app.send('new_track', data);
     }
 }
 
 
 // menubar event listener
-mb.on('ready', function ready() {
-})
+mb.on('ready', function ready() {})
 
 mb.on('show', function ready() {
     send_pinned_status();
@@ -152,32 +175,33 @@ mb.on('after-create-window', function show() {
     app.configure(mb.window.webContents);
     check_new_version()
     mb_ready = true;
+    initSpotify();
     // mb.window.openDevTools();
 })
 
 
 // rpc
-app.on('terminate', function terminate(ev) {
+app.on('terminate', function(ev) {
     mb.app.quit();
 })
 
-app.on('dev', function terminate(ev) {
+app.on('dev', function(ev) {
     mb.window.openDevTools();
 })
 
-app.on('refresh_lyrics', function terminate(ev) {
+app.on('refresh_lyrics', function(ev) {
     if (spotify_ready) {
         refresh_lyrics(helper.status.track);
     }
 })
 
-app.on('refresh_spotify', function terminate(ev) {
+app.on('refresh_spotify', function(ev) {
     helper = SpotifyWebHelper();
     spotify_ready = false;
     initSpotify();
 })
 
-app.on('pinned', function terminate(req, next) {
+app.on('pinned', function(req, next) {
     var next_pinned_status = !mb.getOption('alwaysOnTop');
     mb.setOption('alwaysOnTop', next_pinned_status);
     next(null, {
@@ -186,7 +210,7 @@ app.on('pinned', function terminate(req, next) {
     mb.window.setAlwaysOnTop(next_pinned_status)
 })
 
-app.on('play_pause', function terminate(ev) {
+app.on('play_pause', function(ev) {
     if (spotify_ready) {
         if (helper.status.playing) {
             helper.player.pause();
@@ -194,4 +218,8 @@ app.on('play_pause', function terminate(ev) {
             helper.player.pause(true);
         }
     }
+})
+
+app.on('get_lyrics_from_best_result', function(ev) {
+    get_lyrics_from_best_result();
 })

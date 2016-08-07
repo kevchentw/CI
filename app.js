@@ -1,11 +1,23 @@
 var Client = require('electron-rpc/client')
 var client = new Client()
 
+const webview = document.getElementById('view');
 
-client.on('new_track', function(err, body) {
-    var data = JSON.parse(body);
-    console.log(data);
-    document.getElementById('lyrics_view').src=encodeURI(data.url);
+webview.addEventListener('ipc-message', (event, args) => {
+  console.log(event.channel)
+  console.log(event)
+  if(event.channel=='lyrics_exist'){
+      console.log('exist')
+      if(!event.args[0].exist){
+          client.request('get_lyrics_from_best_result');
+      }
+  }
+})
+
+client.on('new_track', function(err, data) {
+    if (webview){
+        view.src=encodeURI(data.url);
+    }
     console.log(encodeURI(data.url));
 })
 
@@ -28,10 +40,6 @@ function dev() {
     client.request('dev');
 }
 
-function refresh_lyrics() {
-    client.request('refresh_lyrics');
-}
-
 function refresh_spotify() {
     client.request('refresh_spotify');
 }
@@ -52,3 +60,8 @@ function pinned() {
 function playPause() {
     client.request('play_pause');
 }
+
+webview.addEventListener('dom-ready', () => {
+  console.log('dom ready');
+  // webview.openDevTools()
+})
