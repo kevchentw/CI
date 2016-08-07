@@ -8,10 +8,21 @@ CI shows lyrics that you are currently playing on Spotify.
 
 <img src="https://github.com/kevchentw/CI/blob/gh-pages/static/img/preview-1.png?raw=true" width="500">
 
+## Usage
+
+CI stays at your menu bar, click the icon then CI will show the lyrics intanstly!
+
+There are four buttons on it, which are Leave, Play/Pause, Reload Spotify, Pinned.
+
+If the lyrics didn't show up, or it didn't refresh to the new song's lyrics, press Reload to reconnect Spotify.
+
+Jumping circles means that the lyrics is not found.
+
+
+
 ## Platform
 
 It supports Mac, Windows, and Linux. (Thanks to Electron!)
-Currently, only Mac version is tested.
 
 ## Download
 
